@@ -93,7 +93,10 @@ def is_vowel(c: str) -> bool:
 
     """
     assert len(c) == 1, "Input must be a single character."
-    return unidecode(c)[0] in "aeiouy"
+    decode_char = unidecode(c)
+    if len(decode_char) == 0:
+        return False
+    return decode_char[0] in "aeiouy"
 
 
 def is_consonant(c: str) -> bool:
@@ -107,7 +110,10 @@ def is_consonant(c: str) -> bool:
 
     """
     assert len(c) == 1, "Input must be a single character."
-    return unidecode(c)[0] in "bcdfghjklmnpqrstvwxyz"
+    decode_char = unidecode(c)
+    if len(decode_char) == 0:
+        return False
+    return decode_char[0] in "bcdfghjklmnpqrstvwxyz"
 
 
 def categorize_char(c: str) -> int:
@@ -143,7 +149,11 @@ def basic_tokenizer(text: str) -> list:
 
 
 def basic_normalizer(text: str) -> str:
-    """Default normalizer that only converts text to lowercase.
+    """Default normalizer that converts text to lowercase.
+
+    U+0130 (İ, Latin capital letter I with dot above) is replaced with a plain
+    'I' before lowercasing to prevent the length-expanding decomposition that
+    Python's str.lower() would otherwise produce ('i' + combining dot above).
 
     Args:
         text (str): The input text to normalize.
@@ -152,7 +162,7 @@ def basic_normalizer(text: str) -> str:
         str: The normalized text.
 
     """
-    return text.lower()
+    return text.replace("\u0130", "I").lower()
 
 
 def ensure_length_preservation(normalizer: callable) -> callable:
